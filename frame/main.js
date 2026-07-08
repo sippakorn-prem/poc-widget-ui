@@ -2,6 +2,10 @@
   var DEFAULT_CONFIG = {
     displayName: "ZimpleOmni",
     color: "#4f46e5",
+    botColor: "#f2f3f7",
+    avatarText: "",
+    statusText: "Online",
+    launcherText: "Open chat",
     welcome:
       "Hi! This widget is served cross-origin. Send a message and the local demo echo will reply.",
   };
@@ -78,6 +82,7 @@
 
   function render() {
     document.documentElement.style.setProperty("--brand", config.color);
+    document.documentElement.style.setProperty("--bot-bg", config.botColor);
 
     app.innerHTML =
       (isOpen
@@ -87,13 +92,15 @@
           '<header class="head">' +
           '<div class="who">' +
           '<span class="avatar">' +
-          escapeHtml(initials(config.displayName) || "ZO") +
+          escapeHtml(config.avatarText || initials(config.displayName) || "ZO") +
           "</span>" +
           "<div>" +
           '<div class="name">' +
           escapeHtml(config.displayName) +
           "</div>" +
-          '<div class="status"><i></i> Online</div>' +
+          '<div class="status"><i></i> ' +
+          escapeHtml(config.statusText) +
+          "</div>" +
           "</div>" +
           "</div>" +
           '<button class="icon" data-act="toggle" aria-label="Close chat">' +
@@ -116,7 +123,7 @@
       '<button class="launcher ' +
       (isOpen ? "is-open" : "") +
       '" data-act="toggle" aria-label="' +
-      (isOpen ? "Close chat" : "Open chat") +
+      (isOpen ? "Close chat" : escapeHtml(config.launcherText)) +
       '">' +
       (isOpen ? closeIcon : chatIcon) +
       "</button>";
