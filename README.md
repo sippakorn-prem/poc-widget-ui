@@ -10,7 +10,7 @@ This folder is intentionally separate from `ace-omnichat-web`. It has no Next.js
 - `frame/index.html` is the iframe document.
 - `frame/main.js` calls the POC Go API bootstrap endpoint and renders the demo chat UI.
 - `frame/styles.css` styles the iframe UI.
-- `_headers` is for Cloudflare Pages security headers, including `frame-ancestors`.
+- `_headers` is for static Cloudflare Pages security headers.
 
 ## Local Run
 
@@ -44,8 +44,7 @@ GET /widget/v1/bootstrap?key=wk_demo&host=<host-page-origin>
 3. Use no build command.
 4. Set the output directory to `/` or leave it as the project root, depending on the Cloudflare Pages setup.
 5. Deploy.
-6. Replace `https://<C>` in `_headers` with the allowed demo client origin.
-7. Redeploy after editing `_headers`.
+6. Use the Go API `ALLOWED_HOSTS` setting as the dynamic allowlist.
 
 ## Demo Snippet
 
@@ -73,14 +72,23 @@ WIDGET_ORIGIN=https://<B>
 ALLOWED_HOSTS=https://<C>
 ```
 
-## CSP Allowlist
+## Dynamic Allowlist
 
-Cloudflare Pages reads `_headers` from the deploy root:
+This POC intentionally does not use static `frame-ancestors` CSP because that would require a widget redeploy every time the allowed host changes.
+
+Cloudflare Pages still reads `_headers` from the deploy root:
 
 ```text
 /*
-  Content-Security-Policy: frame-ancestors https://<C>
   X-Content-Type-Options: nosniff
 ```
 
-Replace `https://<C>` with the allowed client site origin before the final demo deploy.
+The dynamic gate is the Go API bootstrap check:
+
+```text
+key=wk_demo
+host=https://<C>
+ALLOWED_HOSTS=https://<C>
+```
+
+If someone copies the widget key to another site, the iframe may load, but bootstrap returns `403` and the widget shows the blocked state.
