@@ -8,7 +8,7 @@
 
   var params = new URLSearchParams(window.location.search);
   var apiUrl = params.get("api") || "http://localhost:8080";
-  var host = params.get("host") || "";
+  var host = params.get("host") || referrerOrigin();
   var key = params.get("key") || "wk_demo";
 
   var app = document.getElementById("app");
@@ -26,6 +26,15 @@
     var div = document.createElement("div");
     div.textContent = String(value);
     return div.innerHTML;
+  }
+
+  function referrerOrigin() {
+    if (!document.referrer) return "";
+    try {
+      return new URL(document.referrer).origin;
+    } catch (_err) {
+      return "";
+    }
   }
 
   function initials(name) {
